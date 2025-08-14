@@ -1,12 +1,30 @@
-# React + Vite
+## Meetup App - Gherkin Scenarios
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+```gherkin
+Feature: Meetup App Core Features
 
-Currently, two official plugins are available:
+  Scenario: Toggle event details
+    Given the events list is displayed
+    When the user clicks "Show details" on an event
+    Then the event’s details are displayed
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+  Scenario: Set number of events to display
+    Given the events list is displayed
+    When the user sets the number of events to 10
+    Then exactly 10 events are shown
 
-## Expanding the ESLint configuration
+  Scenario: View cached events offline
+    Given the device is offline
+    When the user opens the events list
+    Then previously cached events are displayed
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+  Scenario: Install app shortcut
+    Given the app meets PWA installation criteria
+    When the user selects "Add to Home Screen"
+    Then the app shortcut appears on the home screen
+
+  Scenario: View events-by-city chart
+    Given events are loaded
+    When the user opens the analytics view
+    Then a chart showing events per city is displayed
+```
