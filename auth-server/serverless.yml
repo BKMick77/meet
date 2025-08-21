@@ -14,6 +14,9 @@ provider:
 functions:
   getAuthURL:
     handler: handler.getAuthURL
+    #test Arm architecture per function maybe switch to global 34% better price/perfomance
+    architecture: arm64
+
     events:
       - http:
           path: api/get-auth-url
@@ -21,6 +24,8 @@ functions:
 
   getAccessToken:
     handler: handler.getAccessToken
+    architecture: arm64
+
     events:
       - http:
           path: api/token/{code}
@@ -28,6 +33,8 @@ functions:
 
   getCalandarEvents:
     handler: handler.getCalendarEvents
+    architecture: arm64
+
     events:
       - http:
           path: api/get-events/{access_token}
