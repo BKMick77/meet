@@ -105,13 +105,7 @@
 <a name='L40'></a><a href='#L40'>40</a>
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
-<a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L43'></a><a href='#L43'>43</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -119,31 +113,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -156,45 +148,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// src/App.jsx
-// src/App.jsx
 import React, { useEffect, useState } from 'react';
 import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
 import NumberOfEvents from './components/NumberOfEvents';
-import { getEvents, extractLocations } from './api'; // &lt;- make sure extractLocations is exported
-import './App.css';
+import { getEvents, extractLocations } from './api';
 &nbsp;
 const App = () =&gt; {
   const [allLocations, setAllLocations] = useState([]);
-  const [currentNOE, setCurrentNOE] = useState(32);
+  const [currentNOE, setCurrentNOE] = useState(32); // like currentCity
   const [events, setEvents] = useState([]);
-  const [currentCity, setCurrentCity] = useState('See all cities'); // default per brief
+  const [currentCity, setCurrentCity] = useState('See all cities'); // existing
 &nbsp;
   const fetchData = async () =&gt; {
     const allEvents = await getEvents();
 &nbsp;
-    const filteredEvents =
+    const filtered =
       currentCity === 'See all cities'
         ? allEvents
-        : allEvents.filter((event) =&gt; event.location === currentCity);
+        : allEvents.filter((e) =&gt; e.location === currentCity);
 &nbsp;
-    setEvents(filteredEvents.slice(0, currentNOE));
-    setAllLocations(extractLocations(allEvents)); // keep superset of locations
+    setEvents(filtered.slice(0, currentNOE));
+    setAllLocations(extractLocations(allEvents));
   };
 &nbsp;
-  // Re-run when currentCity changes (and on mount)
+  // Rerun like CitySearch, but now also when currentNOE changes
   useEffect(() =&gt; {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentCity]);
+  }, [currentCity, currentNOE]);
 &nbsp;
   return (
     &lt;div className='App'&gt;
-      &lt;CitySearch
-        allLocations={allLocations}
-        setCurrentCity={setCurrentCity} // &lt;-- pass the setter to child
-      /&gt;
-      &lt;NumberOfEvents /&gt;
+      &lt;CitySearch allLocations={allLocations} setCurrentCity={setCurrentCity} /&gt;
+&nbsp;
+      &lt;NumberOfEvents currentNOE={currentNOE} setCurrentNOE={setCurrentNOE} /&gt;
+&nbsp;
       &lt;EventList events={events} /&gt;
     &lt;/div&gt;
   );
@@ -208,7 +196,7 @@ export default App;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-03T14:34:35.335Z
+                at 2025-09-03T16:39:49.938Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -8,8 +8,8 @@ const CitySearch = ({ allLocations = [], setCurrentCity = () => {} }) => {
   const handleItemClicked = (event) => {
     const value = event.target.textContent;
     setQuery(value);
-    setShowSuggestions(false); // hide the list
-    setCurrentCity(value); // safe even if parent didn't pass it
+    setShowSuggestions(false);
+    setCurrentCity(value);
   };
 
   const handleInputChanged = (event) => {
@@ -26,7 +26,7 @@ const CitySearch = ({ allLocations = [], setCurrentCity = () => {} }) => {
 
   useEffect(() => {
     setSuggestions(allLocations);
-  }, [allLocations]); // ← fixed
+  }, [allLocations]);
 
   return (
     <div id='city-search'>

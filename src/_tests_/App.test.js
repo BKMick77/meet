@@ -1,24 +1,28 @@
 // src/__tests__/App.test.js
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+jest.mock('../api', () => {
+  const original = jest.requireActual('../api');
+  return {
+    ...original,
+    getEvents: jest.fn().mockResolvedValue(require('../mock-data').default),
+  };
+});
+
 import React from 'react';
 import App from './../App';
-import userEvent from '@testing-library/user-event';
-import { getEvents } from '../api';
+import mockData from '../mock-data';
 
 describe('<App /> component', () => {
-  let AppDOM;
-  beforeEach(() => {
-    AppDOM = render(<App />).container.firstChild;
-  });
-
   test('renders list of events', () => {
-    const AppDOM = render(<App />).container.firstChild;
-    expect(AppDOM.querySelector('#event-list')).toBeInTheDocument();
+    const { container } = render(<App />);
+    expect(container.querySelector('#event-list')).toBeInTheDocument();
   });
 
   test('render CitySearch', () => {
-    const AppDOM = render(<App />).container.firstChild;
-    expect(AppDOM.querySelector('#city-search')).toBeInTheDocument();
+    const { container } = render(<App />);
+    expect(container.querySelector('#city-search')).toBeInTheDocument();
   });
 
   test('App renders the NumberOfEvents component', () => {
@@ -30,30 +34,46 @@ describe('<App /> component', () => {
   describe('<App /> intergration', () => {
     test('renders a list of events matching the city selected by the user', async () => {
       const user = userEvent.setup();
-      const AppComponent = render(<App />);
-      const AppDOM = AppComponent.container.firstChild;
+      const { container } = render(<App />);
 
-      const CitySearchDOM = AppDOM.querySelector('#city-search');
-      const CitySearchInput = within(CitySearchDOM).queryByRole('textbox');
+      const CitySearchDOM = container.querySelector('#city-search');
+      const CitySearchInput = within(CitySearchDOM).getByRole('textbox');
 
       await user.type(CitySearchInput, 'Berlin');
       const berlinSuggestionItem =
-        within(CitySearchDOM).queryByText('Berlin, Germany');
+        within(CitySearchDOM).getByText('Berlin, Germany');
       await user.click(berlinSuggestionItem);
 
-      const EventListDOM = AppDOM.querySelector('#event-list');
-      const allRenderedEventItems =
-        within(EventListDOM).queryAllByRole('listitem');
+      const EventListDOM = container.querySelector('#event-list');
 
-      const allEvents = await getEvents();
-      const berlinEvents = allEvents.filter(
-        (event) => event.location === 'Berlin, Germany'
-      );
+      await waitFor(() => {
+        const items = within(EventListDOM).getAllByRole('listitem');
+        const berlinEvents = mockData.filter(
+          (event) => event.location === 'Berlin, Germany'
+        );
+        expect(items.length).toBe(berlinEvents.length);
+        items.forEach((li) =>
+          expect(li.textContent).toContain('Berlin, Germany')
+        );
+      });
+    });
 
-      expect(allRenderedEventItems.length).toBe(berlinEvents.length);
+    test('user can change the number of events displayed', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<App />);
 
-      allRenderedEventItems.forEach((event) => {
-        expect(event.textContent).toContain('Berlin, Germany');
+      // If this still finds 2 inputs, it means App renders NumberOfEvents twice.
+      const inputs = within(container).getAllByRole('textbox', {
+        name: /number of events/i,
+      });
+      const numberInput = inputs[0];
+
+      await user.type(numberInput, '{backspace}{backspace}10');
+
+      const EventListDOM = container.querySelector('#event-list');
+      await waitFor(() => {
+        const items = within(EventListDOM).getAllByRole('listitem');
+        expect(items.length).toBe(10);
       });
     });
   });

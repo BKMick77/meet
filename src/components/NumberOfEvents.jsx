@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const NumberOfEvents = ({ defaultValue = 32, onChange }) => {
-  const [value, setValue] = useState(String(defaultValue));
+const NumberOfEvents = ({ currentNOE = 32, setCurrentNOE = () => {} }) => {
+  // like CitySearchs query
+  const [value, setValue] = useState(String(currentNOE));
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    setValue(String(currentNOE));
+  }, [currentNOE]);
+
+  const handleInputChanged = (e) => {
     const next = e.target.value;
     setValue(next);
-    if (onChange) onChange(next);
+
+    const parsed = parseInt(next, 10);
+    setCurrentNOE(Number.isNaN(parsed) ? 0 : parsed);
   };
 
   return (
@@ -15,9 +22,9 @@ const NumberOfEvents = ({ defaultValue = 32, onChange }) => {
         Number of events
         <input
           aria-label='Number of events'
-          type='text' // role = textbox (per exercise)
+          type='text'
           value={value}
-          onChange={handleChange}
+          onChange={handleInputChanged}
         />
       </label>
     </div>
